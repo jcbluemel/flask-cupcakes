@@ -20,6 +20,7 @@ app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
 @app.get('/api/cupcakes')
 def list_cupcakes():
+    """Return JSON {'cupcakes': [{id, flavor, size, rating, image}, ...]}"""
 
     cupcakes = Cupcake.query.all()
     serialized = [c.serialize() for c in cupcakes]
@@ -29,6 +30,7 @@ def list_cupcakes():
 
 @app.get('/api/cupcakes/<int:cupcake_id>')
 def get_cupcake(cupcake_id):
+    """Return JSON {'cupcake': {id, flavor, size, rating, image}}"""
 
     cupcake = Cupcake.query.get(cupcake_id)
     serialized = cupcake.serialize()
@@ -38,6 +40,9 @@ def get_cupcake(cupcake_id):
 
 @app.post('/api/cupcakes')
 def create_cupcake():
+    """Create cupcake from JSON data & return it.
+        Returns JSON {'cupcake': {id, flavor, size, rating, image}}
+    """
 
     new_cupcake = Cupcake(
         flavor=request.json["flavor"],
