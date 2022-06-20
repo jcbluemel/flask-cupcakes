@@ -75,6 +75,7 @@ class CupcakeViewsTestCase(TestCase):
                 ]
             })
 
+
     def test_get_cupcake(self):
         with app.test_client() as client:
             url = f"/api/cupcakes/{self.cupcake.id}"
@@ -140,6 +141,19 @@ class CupcakeViewsTestCase(TestCase):
 
             self.assertEqual(Cupcake.query.count(), 1)
 
+    def test_update_wrong_cupcake(self):
+        with app.test_client() as client:
+            url = f"/api/cupcakes/500"
+            resp = client.patch(url, json=UPDATE_CUPCAKE_DATA)
+
+            self.assertEqual(resp.status_code, 404)
+            self.assertEqual(Cupcake.query.count(), 1)
+
+
+
+
+
+
     def test_delete_cupcake(self):
         with app.test_client() as client:
             url = f"/api/cupcakes/{self.cupcake.id}"
@@ -154,3 +168,14 @@ class CupcakeViewsTestCase(TestCase):
             })
 
             self.assertEqual(Cupcake.query.count(), 0)
+
+
+    def test_delete_cupcake_wrong_id(self):
+        with app.test_client() as client:
+            url = f"/api/cupcakes/500"
+            resp = client.delete(url)
+
+            self.assertEqual(resp.status_code, 404)
+
+
+            self.assertEqual(Cupcake.query.count(), 1)

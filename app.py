@@ -80,7 +80,12 @@ def update_cupcake(cupcake_id):
     cupcake.flavor = json.get('flavor', cupcake.flavor)
     cupcake.size = json.get('size', cupcake.size)
     cupcake.rating = json.get('rating', cupcake.rating)
-    cupcake.image = json.get('image', cupcake.image)
+    image_val = json.get('image', cupcake.image)
+    if image_val == "":
+        cupcake.image = DEFAULT_IMG_URL
+    else:
+        cupcake.image = image_val
+
 
     db.session.commit()
     serialized = cupcake.serialize()
@@ -99,4 +104,4 @@ def delete_cupcake(cupcake_id):
     db.session.delete(cupcake)
     db.session.commit()
 
-    return {"deleted": cupcake_id}
+    return jsonify(deleted = cupcake_id)
