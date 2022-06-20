@@ -105,3 +105,11 @@ def delete_cupcake(cupcake_id):
     db.session.commit()
 
     return jsonify(deleted = cupcake_id)
+
+@app.get('/')
+def cupcakes_page():
+    """return render template index.html
+        show static homepage
+    """
+
+    return render_template('index.html')
