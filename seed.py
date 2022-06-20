@@ -2,6 +2,7 @@
 from app import app
 from models import db, Cupcake
 
+
 def connect_db(app):
     """Connect to database."""
 
