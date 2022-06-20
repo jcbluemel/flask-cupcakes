@@ -1,7 +1,7 @@
 """Flask app for Cupcakes"""
 from flask_debugtoolbar import DebugToolbarExtension
 from flask import Flask, request, redirect, render_template, jsonify
-from models import Cupcake, db, connect_db
+from models import Cupcake, db, connect_db, DEFAULT_IMG_URL
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///cupcakes'
@@ -65,3 +65,23 @@ def create_cupcake():
 
     # Return w/status code 201 --- return tuple (json, status)
     return (jsonify(cupcake=serialized), 201)
+
+
+
+
+@app.patch('/api/cupcakes/<int:cupcake_id>')
+def update_cupcake(cupcake_id):
+
+    cupcake = Cupcake.query.get_or_404(cupcake_id)
+
+    json = request.json
+
+    cupcake.flavor = json.get('flavor',cupcake.flavor)
+    cupcake.size = json.get('size',cupcake.size)
+    cupcake.rating = json.get('rating',cupcake.rating)
+    cupcake.image = json.get('image',cupcake.image)
+
+    db.session.commit()
+    serialized = cupcake.serialize()
+
+    return jsonify(cupcake=serialized)
