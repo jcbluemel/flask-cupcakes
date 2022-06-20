@@ -20,7 +20,8 @@ app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
 @app.get('/api/cupcakes')
 def list_cupcakes():
-    """Return JSON {'cupcakes': [{id, flavor, size, rating, image}, ...]}"""
+    """ Data for all cupcakes in db.
+        Return JSON {'cupcakes': [{id, flavor, size, rating, image}, ...]}"""
 
     cupcakes = Cupcake.query.all()
     serialized = [c.serialize() for c in cupcakes]
@@ -30,9 +31,10 @@ def list_cupcakes():
 
 @app.get('/api/cupcakes/<int:cupcake_id>')
 def get_cupcake(cupcake_id):
-    """Return JSON {'cupcake': {id, flavor, size, rating, image}}"""
+    """ Data for a single cupcake based on id.
+    Return JSON {'cupcake': {id, flavor, size, rating, image}}"""
 
-    cupcake = Cupcake.query.get(cupcake_id)
+    cupcake = Cupcake.query.get_or_404(cupcake_id)
     serialized = cupcake.serialize()
 
     return jsonify(cupcake=serialized)
@@ -44,11 +46,16 @@ def create_cupcake():
         Returns JSON {'cupcake': {id, flavor, size, rating, image}}
     """
 
+    flavor = request.json["flavor"],
+    size = request.json["size"],
+    rating = request.json["rating"],
+    image = request.json["image"] if request.json["image"] else None
+
     new_cupcake = Cupcake(
-        flavor=request.json["flavor"],
-        size=request.json["size"],
-        rating=request.json["rating"],
-        image=request.json["image"],
+        flavor=flavor,
+        size=size,
+        rating=rating,
+        image=image,
     )
 
     db.session.add(new_cupcake)
