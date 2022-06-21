@@ -18,6 +18,15 @@ debug = DebugToolbarExtension(app)
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
 
 
+@app.get('/')
+def cupcakes_page():
+    """Show homepage with list of all cupcakes
+        and form to add new cupcake.
+    """
+
+    return render_template('index.html')
+
+
 @app.get('/api/cupcakes')
 def list_cupcakes():
     """ Data for all cupcakes in db.
@@ -105,11 +114,3 @@ def delete_cupcake(cupcake_id):
     db.session.commit()
 
     return jsonify(deleted = cupcake_id)
-
-@app.get('/')
-def cupcakes_page():
-    """return render template index.html
-        show static homepage
-    """
-
-    return render_template('index.html')
