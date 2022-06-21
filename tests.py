@@ -75,7 +75,6 @@ class CupcakeViewsTestCase(TestCase):
                 ]
             })
 
-
     def test_get_cupcake(self):
         with app.test_client() as client:
             url = f"/api/cupcakes/{self.cupcake.id}"
@@ -126,12 +125,9 @@ class CupcakeViewsTestCase(TestCase):
 
             data = resp.json.copy()
 
-            # don't know what ID we'll get, make sure it's an int & normalize
-            self.assertIsInstance(data['cupcake']['id'], int)
-            del data['cupcake']['id']
-
             self.assertEqual(data, {
                 "cupcake": {
+                    "id": self.cupcake.id,
                     "flavor": "TestFlavor3",
                     "size": "TestSize3",
                     "rating": 15,
@@ -149,11 +145,6 @@ class CupcakeViewsTestCase(TestCase):
             self.assertEqual(resp.status_code, 404)
             self.assertEqual(Cupcake.query.count(), 1)
 
-
-
-
-
-
     def test_delete_cupcake(self):
         with app.test_client() as client:
             url = f"/api/cupcakes/{self.cupcake.id}"
@@ -161,7 +152,7 @@ class CupcakeViewsTestCase(TestCase):
 
             self.assertEqual(resp.status_code, 200)
 
-            data = resp.json.copy()
+            data = resp.json
 
             self.assertEqual(data, {
                 "deleted": self.cupcake.id
@@ -169,13 +160,10 @@ class CupcakeViewsTestCase(TestCase):
 
             self.assertEqual(Cupcake.query.count(), 0)
 
-
     def test_delete_cupcake_wrong_id(self):
         with app.test_client() as client:
             url = f"/api/cupcakes/500"
             resp = client.delete(url)
 
             self.assertEqual(resp.status_code, 404)
-
-
             self.assertEqual(Cupcake.query.count(), 1)
