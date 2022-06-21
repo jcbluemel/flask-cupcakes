@@ -2,10 +2,10 @@
 
 from flask_sqlalchemy import SQLAlchemy
 
-
 db = SQLAlchemy()
 
 DEFAULT_IMG_URL = "https://tinyurl.com/demo-cupcake"
+
 
 def connect_db(app):
     """Connect to database."""

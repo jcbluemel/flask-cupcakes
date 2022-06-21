@@ -1,21 +1,21 @@
 """Flask app for Cupcakes"""
+
 from flask_debugtoolbar import DebugToolbarExtension
 from flask import Flask, request, redirect, render_template, jsonify
 from models import Cupcake, db, connect_db, DEFAULT_IMG_URL
 
 app = Flask(__name__)
+
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql:///cupcakes'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config['SQLALCHEMY_ECHO'] = True
-
-
-connect_db(app)
+app.config['SECRET_KEY'] = "SECRET!"
 
 # debug tool bar
-app.config['SECRET_KEY'] = "SECRET!"
 debug = DebugToolbarExtension(app)
-
 app.config['DEBUG_TB_INTERCEPT_REDIRECTS'] = False
+
+connect_db(app)
 
 
 @app.get('/')
@@ -29,8 +29,8 @@ def cupcakes_page():
 
 @app.get('/api/cupcakes')
 def list_cupcakes():
-    """ Data for all cupcakes in db.
-        Return JSON {'cupcakes': [{id, flavor, size, rating, image}, ...]}"""
+    """ Return all cupcakes in db.
+        Returns JSON {'cupcakes': [{id, flavor, size, rating, image}, ...]}"""
 
     cupcakes = Cupcake.query.all()
     serialized = [c.serialize() for c in cupcakes]
@@ -38,20 +38,9 @@ def list_cupcakes():
     return jsonify(cupcakes=serialized)
 
 
-@app.get('/api/cupcakes/<int:cupcake_id>')
-def get_cupcake(cupcake_id):
-    """ Data for a single cupcake based on id.
-    Return JSON {'cupcake': {id, flavor, size, rating, image}}"""
-
-    cupcake = Cupcake.query.get_or_404(cupcake_id)
-    serialized = cupcake.serialize()
-
-    return jsonify(cupcake=serialized)
-
-
 @app.post('/api/cupcakes')
 def create_cupcake():
-    """Create cupcake from JSON data & return it.
+    """Create cupcake from JSON & return data about it.
         Returns JSON {'cupcake': {id, flavor, size, rating, image}}
     """
 
@@ -72,29 +61,39 @@ def create_cupcake():
 
     serialized = new_cupcake.serialize()
 
-    # Return w/status code 201 --- return tuple (json, status)
     return (jsonify(cupcake=serialized), 201)
+
+
+@app.get('/api/cupcakes/<int:cupcake_id>')
+def get_cupcake(cupcake_id):
+    """ Data for a single cupcake based on id.
+    Returns JSON {'cupcake': {id, flavor, size, rating, image}}"""
+
+    cupcake = Cupcake.query.get_or_404(cupcake_id)
+    serialized = cupcake.serialize()
+
+    return jsonify(cupcake=serialized)
 
 
 @app.patch('/api/cupcakes/<int:cupcake_id>')
 def update_cupcake(cupcake_id):
-    """Update cupcake from JSON data & return it.
+    """Update cupcake from JSON data & return updated data.
         Returns JSON {'cupcake': {id, flavor, size, rating, image}}
     """
 
     cupcake = Cupcake.query.get_or_404(cupcake_id)
 
-    json = request.json
+    data = request.json
 
-    cupcake.flavor = json.get('flavor', cupcake.flavor)
-    cupcake.size = json.get('size', cupcake.size)
-    cupcake.rating = json.get('rating', cupcake.rating)
-    image_val = json.get('image', cupcake.image)
+    cupcake.flavor = data.get('flavor', cupcake.flavor)
+    cupcake.size = data.get('size', cupcake.size)
+    cupcake.rating = data.get('rating', cupcake.rating)
+    image_val = data.get('image', cupcake.image)
+
     if image_val == "":
         cupcake.image = DEFAULT_IMG_URL
     else:
         cupcake.image = image_val
-
 
     db.session.commit()
     serialized = cupcake.serialize()

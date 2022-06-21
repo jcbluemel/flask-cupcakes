@@ -21,7 +21,7 @@ async function addCupcake() {
 
   $cupcakeList.append(
     `<li>
-      ${cupcake.flavor}
+      ${cupcakeInfo.flavor}
     </li>
     `
   )
